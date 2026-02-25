@@ -49,10 +49,19 @@
 //         Some(i) => Some(i + 1),
 //     }
 // }
+enum SpreadsheetCell {
+    Int(i32),
+    Float(f64),
+    Text(String),
+}
 
 fn main() {
-
-    let v = 0u8;
+    let row = vec![
+        SpreadsheetCell::Int(3),
+        SpreadsheetCell::Text(String::from("blue")),
+        SpreadsheetCell::Float(10.12),
+    ];
+    
     // match v {
     //     1 => println!("one"),
     //     2 => println!("two"),
@@ -64,12 +73,8 @@ fn main() {
         println!("three");
     }
 
-
     // let c = Coin::Quarter((UsState::Alasaka));
     // println!("value_in_cents in : {:?}",value_in_cents(c));
-
-
-
 
     // let four = IpAddrKind::V4;
     // let six = IpAddrKind::V6;
@@ -86,11 +91,5 @@ fn main() {
     // let c = Message:: ChangeColor(0 ,255 ,255);
     //
     // m.call()
-
-
-
-
-
-
 }
 // fn route(ip_kind: IpAddrKind)  {}
