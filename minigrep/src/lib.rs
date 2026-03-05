@@ -6,29 +6,29 @@ pub struct Config{
     pub filename: String,
     pub case_sensitive: bool,
 }
-fn judge_from_cmd(args: &[String]) -> bool{
-    if args.len() > 3 && (&args[3]).contains("CASE_INSENSITIVE") { println!("{}",&args[3]);return false; }
-    true
-}
-fn judge(args: &[String]) -> bool{
-    match judge_from_cmd(args) {
-        false => false,
-        true => {
-            env::var("CASE_INSENSITIVE").is_err()
-        }
+// fn judge_from_cmd(args: &[String]) -> bool{
+fn is_not_sensitive_from_command_line(mut args: std::env::Args) -> bool{
+    match args.next() {
+        Some(s) => s.contains("CASE_INSENSITIVE"),
+        None => false
     }
 }
-
+// fn judge(args: &[String]) -> bool{
+fn is_not_sensitive_from_env(args: std::env::Args) -> bool{
+    match is_not_sensitive_from_command_line(args) {
+        true => true ,
+        false => env::var("CASE_INSENSITIVE").is_err()
+    }
+}
 impl Config{
-    pub fn new(args: &[String]) -> Result<Config, &'static  str> {
-        if args.len() <3 {
-            // panic!("\x1b[31mNot enough argument\x1b[0m");
-            return Err("not enough arguments");
-        }
-        let query = args[1].clone();
-        let filename = args[2].clone();
+    pub fn new(mut args: std::env::Args) -> Result<Config, &'static  str> {
+        args.next();
+        // let query = args[1].clone();
+        // let filename = args[2].clone();
+        let query = args.next().ok_or("not enough arguments")?;
+        let filename = args.next().ok_or("not enough arguments")?;
+        let case_sensitive = is_not_sensitive_from_env(args);
         // if casesensitive_on_cmd.contains("CASE_INSENSITIVE") { case_sensitive = false; }
-        let case_sensitive = judge(&args);
         Ok(Config{
             query,
             filename,
@@ -52,14 +52,9 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>>{
 }
 
 pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str>{
-    let mut results = Vec::new();
-
-    for line in contents.lines() {
-        if line.contains(query) {
-            results.push(line);
-        }
-    };
-    results
+    contents.lines()
+        .filter(| line | line.contains(query))
+        .collect()
 }
 pub fn search_case_insensitive<'a>(query: &str,contents: &'a str) -> Vec<&'a str>{
     let mut results = Vec::new();
